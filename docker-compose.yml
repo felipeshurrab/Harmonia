@@ -1,0 +1,60 @@
+services:
+  api:
+    container_name: api_container
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=harmonia_user;Password=HarmoniaDbP@ss!;Server=postgres_container;Port=5432;Database=HarmoniaDB;Pooling=true;
+      - ASPNETCORE_URLS=http://+:5000
+    networks:
+      - dev_network
+  postgres_db:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: harmonia_user
+      POSTGRES_PASSWORD: HarmoniaDbP@ss!
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_data:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - dev_network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U harmonia_user -d HarmoniaDB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@harmonia.local
+      PGADMIN_DEFAULT_PASSWORD: HarmoniaDbP@ss!
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+    ports:
+      - "8080:80"
+    networks:
+      - dev_network
+    restart: unless-stopped
+
+networks:
+  dev_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
