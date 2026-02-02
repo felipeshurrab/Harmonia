@@ -39,7 +39,7 @@ services:
     container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@harmonia.local
+      PGADMIN_DEFAULT_EMAIL: admin@harmonia.com
       PGADMIN_DEFAULT_PASSWORD: HarmoniaDbP@ss!
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
